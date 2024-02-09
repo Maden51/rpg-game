@@ -205,6 +205,7 @@ function attack() {
       winGame();
     } else defeatMonster();
   }
+  // TODO: Убрать абузку меча как единственного оружия
   if (Math.random() <= .1 && inventory.length !== 1) {
     text.innerText += " Your " + inventory.pop() + " breaks."
     currentWeapon --;
@@ -213,7 +214,7 @@ function attack() {
 
 function getMonsterAttackValue(level) {
   const hit = (level * 5) - (Math.floor(Math.random() * xp));
-  console.log(hit);
+  console.log(hit, 'monster attack');
   return hit > 0 ? hit : 0;
 }
 
