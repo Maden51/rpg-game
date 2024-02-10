@@ -36,12 +36,14 @@ const monsters = [
 
 const locations = [
   {
+    id: 0,
     name: "town square",
     "button text": ["Go to store", "Go to cave", "Fight Dragon"],
     "button functions": [ goStore, goCave, fightDragon],
     text: "You are in the town square. You see a sign that says \"Store\"."
   },
   {
+    id: 1,
     name: "store",
     "button text": [
       "Buy 10 health (10 gold)",
@@ -52,6 +54,7 @@ const locations = [
     text: "You enter the store."
   },
   {
+    id: 2,
     name: "cave",
     "button text": [
       "Fight slime",
@@ -62,36 +65,54 @@ const locations = [
     text: "You enter the cave. You see some monsters."
   },
   {
+    id: 3,
     name: "fight",
     "button text": ["Attack", "Dodge", "Run"],
     "button functions": [ attack, dodge, goTown ],
     text: "You are fighting a monster."
   },
   {
+    id: 4,
     name: "kill monster",
     "button text": ["Go to town square", "Go to town square", "Go to town square"],
     "button functions": [ goTown, goTown, easterEgg ],
     text: 'The monster screams "Arg!" as it dies. You gain experience points and gold.'
   },
   {
+    id: 5,
     name: "lose",
     "button text": ["REPLAY?", "REPLAY?", "REPLAY?"],
     "button functions": [ restart, restart, restart],
     text: "You died. &#x2620;"
   },
   {
+    id: 6,
     name: "win",
     "button text": ["REPLAY?", "REPLAY?", "REPLAY?"],
     "button functions": [ restart, restart, restart],
     text: "You defeat the dragon! YOU WIN THE GAME! &#x1F389;"
   },
   {
+    id: 7,
     name: "easter egg",
     "button text": ["2", "8", "Go to town square?"],
     "button functions": [ pickTwo, pickEight, goTown],
     text: "You find a secret game. Pick a number above. Ten numbers will be randomly chosen between 0 and 10. If the number you choose matches one of the random numbers, you win!"
+  },
+  {
+    id: 8,
+    name: 'no weapon',
+    "button text": ["Stick", "Stick", "Stick" ],
+    "button functions": [ getStick, getStick, getStick ],
+    text: "You found a new stick on the floor. Pick it up.",
+  },
+  {
+    id: 9,
+    name: 'broken weapon',
+    "button text": ["RUN", "RUN", "RUN" ],
+    "button functions": [ findStick, findStick, findStick ],
+    text: "Run for your life!",
   }
-  
 ];
 
 // initialize buttons
@@ -121,6 +142,14 @@ function goStore() {
 
 function goCave() {
   update(locations[2]);
+}
+
+function runWithoutWeapon() {
+  update(locations[9]);
+}
+
+function findStick() {
+  update(locations[8]);
 }
 
 function buyHealth() {
@@ -164,6 +193,12 @@ function sellWeapon() {
   }
 }
 
+function getStick() {
+  currentWeapon = 0;
+  inventory.push('stick');
+  goTown();
+}
+
 function goFight() {
   update(locations[3]);
   monsterHealth = monsters[fighting].health;
@@ -205,10 +240,18 @@ function attack() {
       winGame();
     } else defeatMonster();
   }
-  // TODO: Убрать абузку меча как единственного оружия
-  if (Math.random() <= .1 && inventory.length !== 1) {
+  
+  if (Math.random() <= .1) {
     text.innerText += " Your " + inventory.pop() + " breaks."
     currentWeapon --;
+    if (inventory.length === 0) {
+      runWithoutWeapon();
+      text.innerText += " You have no weapons! Run! Monster hits you one more time.";
+      healthText.innerText = health -= 5;
+      if (health <= 0) {
+        lose();
+      } 
+    }
   } 
 }
 
